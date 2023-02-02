@@ -64,13 +64,18 @@ public class MoveGen
         MoveList moves = genAllMoves(pos);
         long nodes = 0L;
 
+        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
+        boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
+
         for (int i = 0; i < moves.count; i++) 
         {
             int move = moves.moves[i];
             Position newPos = pos.copy();
 
-            if (newPos.makeMove(move)) 
+            if (newPos.makeMove(move, inCheck, kingSq)) 
+            {
                 nodes += perft(newPos, (byte)(depth-1));
+            }
         }
         return nodes;
     }
@@ -217,7 +222,7 @@ public class MoveGen
         }
     }
 
-    private static long genRookMovesBB(byte from, long blockers) 
+    public static long genRookMovesBB(byte from, long blockers) 
     {
         MagicSqInfo magic = Magic.ROOK_MAGICS[from];
         blockers &= magic.blockerMask;
@@ -225,7 +230,7 @@ public class MoveGen
         return Magic.ROOK_MOVES[from][(int)index];
     }
 
-    private static long genBishopMovesBB(byte from, long blockers) 
+    public static long genBishopMovesBB(byte from, long blockers) 
     {
         MagicSqInfo magic = Magic.BISHOP_MAGICS[from];
         blockers &= magic.blockerMask;

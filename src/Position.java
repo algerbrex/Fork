@@ -108,7 +108,7 @@ public class Position {
         return newPos;
     }
 
-    public boolean makeMove(int move) 
+    public boolean makeMove(int move, boolean inCheck, byte currStmKingSq) 
     {
         byte from     = Move.getFromSq(move);
         byte to       = Move.getToSq(move);
@@ -120,6 +120,8 @@ public class Position {
         
         rule50++;
         epSq = Square.NO_EP_SQ;
+
+        long pinned = getPinnedPieces(stm);
 
         switch (moveType)
         {
@@ -215,8 +217,16 @@ public class Position {
         rights = (byte)(rights & SPOILERS[from] & SPOILERS[to]);
         stm = flipColor(stm);
 
-        byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[flipColor(stm)]);
-        return !MoveGen.sqIsAttacked(this, flipColor(stm), kingSq);
+        if (inCheck ||
+            from == currStmKingSq ||
+            Bitboard.bitSet(pinned, from) || 
+            (moveType == Move.ATTACK && flag == Move.ATTACK_EP)) 
+        {
+            byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[flipColor(stm)]);
+            return !MoveGen.sqIsAttacked(this, flipColor(stm), kingSq);
+        }
+
+        return true;
     }
 
     public byte getPieceType(int sq) 
@@ -245,6 +255,34 @@ public class Position {
         long blackBB  = (sqBB & sides[BLACK]) >>> shift;
   
         return (byte)(whiteBB*WHITE | blackBB*BLACK); 
+    }
+
+    private long getPinnedPieces(byte usColor) 
+    {
+        byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[usColor]);
+
+        long usBB = sides[usColor];
+        long enemyBB = sides[flipColor(usColor)];
+
+        long enemyQueensAndRooks = enemyBB & (pieces[QUEEN] | pieces[ROOK]);
+        long enemyQueensAndBishops = enemyBB & (pieces[QUEEN] | pieces[BISHOP]);
+
+        long cardinalRays = MoveGen.genRookMovesBB(kingSq, enemyBB);
+        long intercardinalRays = MoveGen.genBishopMovesBB(kingSq, enemyBB);
+
+        long potentialPinners = (enemyQueensAndRooks & cardinalRays) | 
+                                (enemyQueensAndBishops & intercardinalRays);
+        long pinned = 0L;
+
+        while (potentialPinners != 0)
+        {
+            byte pinnerSq = Bitboard.findMSBPos(potentialPinners);
+            potentialPinners = Bitboard.clearBit(potentialPinners, pinnerSq);
+
+            pinned |= usBB & (Tables.RAYS_BETWEEN[kingSq][pinnerSq]);
+        }
+
+        return pinned;
     }
 
     private void putPiece(byte pieceType, byte pieceColor, byte sq) 
