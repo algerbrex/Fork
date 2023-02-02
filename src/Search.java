@@ -2,9 +2,9 @@ public class Search
 {
     private final static int MAX_PLY       = 100;
     private final static int MAX_PV_LENGTH = 50;
-    public int INFINITY      = 10000;
+    public final static int INFINITY      = 10000;
 
-    private Position pos;
+    public Position pos;
     private long totalNodes;
 
     private class PVLine 
