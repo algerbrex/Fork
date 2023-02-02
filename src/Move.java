@@ -12,6 +12,8 @@ public class Move {
     public final static byte ATTACK_EP = 1;
     public final static byte NO_FLAG   = 0;
 
+    public final static int NULL_MOVE = 0;
+
     public static int makeMove(byte from, byte to, byte moveType, byte flag) 
     {
         return (int)(from) << 26 | (int)(to) << 20 | (int)(moveType) << 18 | (int)(flag) << 16;
