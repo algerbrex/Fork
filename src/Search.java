@@ -55,6 +55,7 @@ public class Search
     public Search(String fen) 
     {
         pos = new Position(fen);
+        System.out.println(Evaluation.evaluate(pos));
     }
 
     public int search(int searchDepth) 
@@ -92,7 +93,7 @@ public class Search
         totalNodes++;
 
         if (depth == 0 || ply == MAX_PLY)
-            return 0;
+            return Evaluation.evaluate(pos);
 
         byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
