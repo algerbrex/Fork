@@ -43,6 +43,10 @@ public class Position {
 
     public Position(String fen) 
     {
+        loadFEN(fen);
+    }
+
+    public void loadFEN(String fen) {
         pieces = new long[7];
         sides = new long[3];
         rights = stm = rule50 = epSq = 0;
