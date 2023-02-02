@@ -82,7 +82,7 @@ public class Position {
         }
 
         stm = activeColor.equals("w") ? WHITE : BLACK;
-        epSq = activeEPSq.equals("-") ? Square.NO_EP_SQ : Square.coordToSq(activeEPSq);
+        epSq = activeEPSq.equals("-") ? Square.NO_SQ : Square.coordToSq(activeEPSq);
         rule50 = Byte.parseByte(halfMoveClock);
 
         for (int i = 0; i < castlingRights.length(); i++) 
@@ -123,7 +123,7 @@ public class Position {
         byte movedColor = getPieceColor(from);
         
         rule50++;
-        epSq = Square.NO_EP_SQ;
+        epSq = Square.NO_SQ;
 
         long pinned = getPinnedPieces(stm);
 
@@ -343,7 +343,7 @@ public class Position {
         if ((rights&BLACK_QS_RIGHT) != 0)
             boardStr += "q";
 
-        boardStr += "\nen passant: " + (epSq == Square.NO_EP_SQ ? "none" : Square.sqToCoord(epSq));
+        boardStr += "\nen passant: " + (epSq == Square.NO_SQ ? "none" : Square.sqToCoord(epSq));
         boardStr += "\nrule 50: " + rule50;
 
         return boardStr;
