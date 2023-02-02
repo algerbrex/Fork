@@ -55,7 +55,6 @@ public class Search
     public Search(String fen) 
     {
         pos = new Position(fen);
-        System.out.println(Evaluation.evaluate(pos));
     }
 
     public int search(int searchDepth) 
