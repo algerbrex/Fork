@@ -90,7 +90,7 @@ public class Search implements Runnable
             // Put timer logic here to get best move if we run out of time.
 
             long startTime = System.currentTimeMillis();
-            int score = negamax(pos, depth, 0, pv);
+            int score = negamax(pos, depth, 0, -INFINITY, INFINITY, pv);
             long endTime = System.currentTimeMillis();
 
             if (timer.isStopped())
@@ -115,7 +115,7 @@ public class Search implements Runnable
         System.out.println("bestmove " + Move.toString(bestMove));
     }
 
-    public int negamax(Position pos, int depth, int ply, PVLine pv)
+    public int negamax(Position pos, int depth, int ply, int alpha, int beta, PVLine pv)
     {
         currSearchNodeCnt++;
 
@@ -150,11 +150,17 @@ public class Search implements Runnable
 
             numLegalMoves++;
 
-            int score = -negamax(newPos, depth - 1, ply + 1, childPV);
-
+            int score = -negamax(newPos, depth - 1, ply + 1, -beta, -alpha, childPV);
+            
             if (score > bestScore)
-            {
                 bestScore = score;
+
+            if (bestScore >= beta)
+                break;
+
+            if (bestScore > alpha)
+            {
+                alpha = bestScore;
                 pv.updatePV(move, childPV);
             }
 
