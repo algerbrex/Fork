@@ -1,11 +1,14 @@
-public class Search 
+public class Search implements Runnable
 {
-    private final static int MAX_PLY       = 100;
-    private final static int MAX_PV_LENGTH = 50;
-    public final static int INFINITY      = 10000;
+    public final static int MAX_PLY              = 100;
+    public final static int INFINITY             = 10000;
+    private final static int CHECKMATE_THRESHOLD = 9000;
+    private final static int MAX_PV_LENGTH       = 50;
 
     public Position pos;
+    public Timer timer;
     private long totalNodes;
+    private long currSearchNodeCnt;
 
     private class PVLine 
     {
@@ -50,22 +53,39 @@ public class Search
     public Search() 
     {
         pos = new Position(Position.START_FEN);
+        timer = new Timer();
     }
 
     public Search(String fen) 
     {
         pos = new Position(fen);
+        timer = new Timer();
     }
 
-    public int search(int searchDepth) 
+    @Override
+    public void run()
+    {
+        search();
+    }
+
+    public void stopSearch()
+    {
+        timer.forceStop();
+    }
+
+    public void search() 
     {
         PVLine pv = new PVLine();
         int bestMove = Move.NULL_MOVE;
         long totalTime = 0L;
+        totalNodes = 0L;
 
-        for (int depth = 1; depth <= searchDepth; depth++)
+        timer.start();
+
+        for (int depth = 1; depth <= MAX_PLY && depth <= timer.maxDepth; depth++)
         {
             pv.clear();
+            currSearchNodeCnt = 0L;
 
             // Put timer logic here to get best move if we run out of time.
 
@@ -73,26 +93,43 @@ public class Search
             int score = negamax(pos, depth, 0, pv);
             long endTime = System.currentTimeMillis();
 
-            totalTime += (endTime - startTime);
+            if (timer.isStopped())
+            {
+                if (bestMove == Move.NULL_MOVE && depth == 1)
+                    bestMove = pv.getBestMove();
+                break;
+            }
+
+            totalTime += (endTime - startTime) + 1;
             bestMove = pv.getBestMove();
 
             long nps = (totalNodes * 1000) / totalTime;
+            totalNodes += currSearchNodeCnt;
 
             System.out.printf(
                 "info depth %d score %s nodes %d nps %d time %d pv %s\n",
-                depth, score, totalNodes, nps, totalTime, pv
+                depth, getMateOrCPScore(score), totalNodes, nps, totalTime, pv
             );
         }
 
-        return bestMove;
+        System.out.println("bestmove " + Move.toString(bestMove));
     }
 
     public int negamax(Position pos, int depth, int ply, PVLine pv)
     {
-        totalNodes++;
+        currSearchNodeCnt++;
 
         if (depth == 0 || ply == MAX_PLY)
             return Evaluation.evaluate(pos);
+
+        if (totalNodes + currSearchNodeCnt >= timer.maxNodeCount)
+            timer.forceStop();
+
+        if ((currSearchNodeCnt & 2047) == 0)
+            timer.checkIfTimeIsUp();
+
+        if (timer.isStopped())
+            return 0;
 
         byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
@@ -128,5 +165,26 @@ public class Search
             return -INFINITY + ply;
 
         return bestScore;
+    }
+
+    // Display the correct format for the search score if it's a centipawn score
+    // or a checkmate score.
+    private String getMateOrCPScore(int score) 
+    {
+        if (score > CHECKMATE_THRESHOLD) 
+        {
+            int pliesToMate = INFINITY - score;
+            int mateInN = (pliesToMate / 2) + (pliesToMate % 2);
+            return String.format("mate %d", mateInN);
+        }
+
+        if (score < -CHECKMATE_THRESHOLD) 
+        {
+            int pliesToMate = -INFINITY - score;
+            int mateInN = (pliesToMate / 2) + (pliesToMate % 2);
+            return String.format("mate %d", mateInN);
+        }
+
+        return String.format("cp %d", score);
     }
 }

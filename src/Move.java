@@ -54,6 +54,46 @@ public class Move {
         return (move_1 & 0xffff0000) == (move_2 & 0xffff0000);
     }
 
+    public static int moveFromCoord(Position pos, String coord)
+    {
+        byte from = Square.coordToSq(coord.substring(0, 2));
+        byte to   = Square.coordToSq(coord.substring(2, 4));
+        byte movedType = pos.getPieceType(from);
+
+        byte moveType = 0;
+        byte flag = Move.NO_FLAG;
+
+        if (coord.length() == 5)
+        {
+            moveType = Move.PROMOTION;
+            if (coord.charAt(coord.length() - 1) == 'n')
+                flag = Move.KNIGHT_PROMO;
+            else if (coord.charAt(coord.length() - 1) == 'b')
+                flag = Move.BISHOP_PROMO;
+            else if (coord.charAt(coord.length() - 1) == 'r')
+                flag = Move.ROOK_PROMO;
+            else if (coord.charAt(coord.length() - 1) == 'q')
+                flag = Move.QUEEN_PROMO;
+        } 
+        else if (coord.equals("e1g1") && movedType == Position.KING)
+            moveType = Move.CASTLE;
+        else if (coord.equals("e1c1") && movedType == Position.KING)
+            moveType = Move.CASTLE;
+        else if (coord.equals("e8g8") && movedType == Position.KING)
+            moveType = Move.CASTLE; 
+        else if (coord.equals("e8c8") && movedType == Position.KING)
+            moveType = Move.CASTLE;
+        else if (to == pos.epSq && movedType == Position.PAWN)
+        {
+            moveType = Move.ATTACK;
+            flag = Move.ATTACK_EP;
+        }
+        else
+            moveType = pos.getPieceType(to) == Position.NO_TYPE ? Move.QUIET : Move.ATTACK;
+
+        return makeMove(from, to, moveType, flag);
+    }
+
     public static String toString(int move) 
     {
         byte from     = getFromSq(move);
