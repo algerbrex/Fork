@@ -189,7 +189,7 @@ public class Tables {
             for (int j = i + 8; j < 64; j += 8)
                 northRay |= (Bitboard.MSB >>> j);
 
-            for (int j = i - 8; j > 0; j -= 8)
+            for (int j = i - 8; j >= 0; j -= 8)
                 southRay |= (Bitboard.MSB >>> j);
 
             for (int j = i + 1; j % 8 != 0; j++)
