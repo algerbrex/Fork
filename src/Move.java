@@ -44,9 +44,9 @@ public class Move {
         return (short)(move & 0xffff);
     } 
 
-    public static int addScore(int move, short score) 
+    public static int addScore(int move, int score) 
     {
-        return (move & 0xffff0000) | (int)score;
+        return (move & 0xffff0000) | score;
     }
 
     public static boolean equals(int move_1, int move_2) 

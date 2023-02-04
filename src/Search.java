@@ -9,6 +9,15 @@ public class Search implements Runnable
     public Timer timer;
     private long totalNodes;
     private long currSearchNodeCnt;
+    private int[][] MVV_LVA = new int[][] {
+        {0, 0, 0, 0, 0, 0},
+        {0, 30, 31, 32, 33, 34},   // attacking pawn
+        {0, 25, 26, 27, 28, 29},   // attacking knight
+        {0, 20, 21, 22, 23, 24},   // attacking bishop
+        {0, 15, 16, 17, 18, 19},   // attacking rook
+        {0, 10, 11, 12, 13, 14},   // attacking queen
+        {0, 5,  6,  7,  8,  9 },        // attacking king
+    };
 
     private class PVLine 
     {
@@ -146,8 +155,13 @@ public class Search implements Runnable
         int bestScore = -INFINITY;
         int numLegalMoves = 0;
 
+        scoreMoves(pos, moves.moves, moves.count);
+
         for (int i = 0; i < moves.count; i++)
         {
+
+            swapBestMoveToIdx(moves.moves, moves.count, i);
+
             int move = moves.moves[i];
             Position newPos = pos.copy();
 
@@ -206,8 +220,12 @@ public class Search implements Runnable
         MoveList moves = MoveGen.genAllMoves(pos);
         PVLine childPV = new PVLine();
 
+        scoreMoves(pos, moves.moves, moves.count);
+
         for (int i = 0; i < moves.count; i++)
         {
+            swapBestMoveToIdx(moves.moves, moves.count, i);
+
             int move = moves.moves[i];
             byte moveType = Move.getMoveType(move);
 
@@ -237,6 +255,44 @@ public class Search implements Runnable
         }
 
         return bestScore;
+    }
+
+    private void scoreMoves(Position pos, int[] moves, int numMoves)
+    {
+        for (int i = 0; i < numMoves; i++)
+        {
+            int move = moves[i];
+            
+            if (Move.getMoveType(moves[i]) == Move.ATTACK)
+            {
+                int from = Move.getFromSq(move), to = Move.getToSq(move);
+                byte attackerType = pos.getPieceType(from), attackedType = pos.getPieceType(to);
+                moves[i] = Move.addScore(move, MVV_LVA[attackerType][attackedType]);
+            }
+        }
+    }
+
+    private void swapBestMoveToIdx(int[] moves, int numMoves, int index)
+    {
+        int bestMoveScore = Move.getScore(moves[index]);
+        int bestMoveIndex = index;
+
+        for (int i = index; i < numMoves; i++)
+        {
+            int moveScore = Move.getScore(moves[i]);
+            if (moveScore > bestMoveScore) 
+            {
+                bestMoveScore = moveScore;
+                bestMoveIndex = i;
+            }
+        }
+
+        if (bestMoveIndex != index)
+        {
+            int bestMove = moves[bestMoveIndex];
+            moves[bestMoveIndex] = moves[index];
+            moves[index] = bestMove;
+        }
     }
 
     // Display the correct format for the search score if it's a centipawn score
