@@ -5,6 +5,7 @@ public class Search implements Runnable
     public final static int MAX_PLY              = 100;
     public final static int INFINITY             = 10000;
     private final static int CHECKMATE_THRESHOLD = 9000;
+    private final static int DRAW                = 0;
     private final static int MAX_PV_LENGTH       = 50;
 
     public Position pos;
@@ -189,9 +190,13 @@ public class Search implements Runnable
             childPV.clear();
         }
 
-        if (inCheck && numLegalMoves == 0)
-            return -INFINITY + ply;
-
+        if (numLegalMoves == 0)
+        {
+            if (inCheck)
+                return -INFINITY + ply;
+            return DRAW;
+        }
+        
         return bestScore;
     }
 
