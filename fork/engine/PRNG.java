@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class PRNG 
 {
     private long state;

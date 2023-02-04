@@ -1,3 +1,5 @@
+package fork.engine;
+
 import java.lang.Long;
 
 public class Bitboard 

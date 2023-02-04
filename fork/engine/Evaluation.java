@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class Evaluation 
 {
     public static final int PAWN_VALUE   = 100;

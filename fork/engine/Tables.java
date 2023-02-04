@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class Tables {
     public static final long[] MASK_DIAGONAL = 
     {

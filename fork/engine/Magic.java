@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class Magic {
     public static final MagicSqInfo[] ROOK_MAGICS;
     public static final MagicSqInfo[] BISHOP_MAGICS;

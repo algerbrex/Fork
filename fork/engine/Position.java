@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class Position {
     public final static byte NO_TYPE = 0;
     public final static byte PAWN    = 1;

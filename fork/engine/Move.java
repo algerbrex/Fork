@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class Move {
     public final static byte QUIET     = 0;
     public final static byte ATTACK    = 1;

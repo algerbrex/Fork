@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class MoveList 
 {
     private static final int MAX_MOVES = 255;

@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class Search implements Runnable
 {
     public final static int MAX_PLY              = 100;

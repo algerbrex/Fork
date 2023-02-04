@@ -1,3 +1,5 @@
+package fork.engine;
+
 public class MoveGen
 {
     private static final long F1_G1 = 0x600000000000000L, B1_C1_D1 = 0x7000000000000000L,
