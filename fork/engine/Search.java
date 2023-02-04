@@ -231,14 +231,12 @@ public class Search implements Runnable
 
         for (int i = 0; i < moves.count; i++)
         {
+            if (Move.getMoveType(moves.moves[i]) != Move.ATTACK)
+                continue; 
+
             swapBestMoveToIdx(moves.moves, moves.count, i);
 
             int move = moves.moves[i];
-            byte moveType = Move.getMoveType(move);
-
-            if (moveType != Move.ATTACK)
-                continue; 
-
             Position newPos = pos.copy();
 
             if (!newPos.makeMove(move, inCheck, kingSq))
