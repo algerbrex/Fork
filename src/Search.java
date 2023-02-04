@@ -119,8 +119,14 @@ public class Search implements Runnable
     {
         currSearchNodeCnt++;
 
-        if (depth == 0 || ply == MAX_PLY)
+        if (ply == MAX_PLY) 
             return Evaluation.evaluate(pos);
+
+        if (depth == 0)
+        {
+            currSearchNodeCnt--;
+            return quiescenceSearch(pos, alpha, beta, pv);
+        }
 
         if (totalNodes + currSearchNodeCnt >= timer.maxNodeCount)
             timer.forceStop();
@@ -169,6 +175,66 @@ public class Search implements Runnable
 
         if (inCheck && numLegalMoves == 0)
             return -INFINITY + ply;
+
+        return bestScore;
+    }
+
+    public int quiescenceSearch(Position pos, int alpha, int beta, PVLine pv)
+    {
+        currSearchNodeCnt++;
+
+        if (totalNodes + currSearchNodeCnt >= timer.maxNodeCount)
+            timer.forceStop();
+
+        if ((currSearchNodeCnt & 2047) == 0)
+            timer.checkIfTimeIsUp();
+
+        if (timer.isStopped())
+            return 0;
+
+        int bestScore = Evaluation.evaluate(pos);
+
+        if (bestScore >= beta)
+            return bestScore;
+
+        if (alpha < bestScore)
+            alpha = bestScore;
+
+        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
+        boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
+
+        MoveList moves = MoveGen.genAllMoves(pos);
+        PVLine childPV = new PVLine();
+
+        for (int i = 0; i < moves.count; i++)
+        {
+            int move = moves.moves[i];
+            byte moveType = Move.getMoveType(move);
+
+            if (moveType != Move.ATTACK)
+                continue; 
+
+            Position newPos = pos.copy();
+
+            if (!newPos.makeMove(move, inCheck, kingSq))
+                continue;
+
+            int score = -quiescenceSearch(newPos, -alpha, -beta, childPV);
+            
+            if (score > bestScore)
+                bestScore = score;
+
+            if (bestScore >= beta)
+                break;
+
+            if (bestScore > alpha)
+            {
+                alpha = bestScore;
+                pv.updatePV(move, childPV);
+            }
+
+            childPV.clear();
+        }
 
         return bestScore;
     }
