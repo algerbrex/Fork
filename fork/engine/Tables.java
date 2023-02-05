@@ -85,8 +85,8 @@ public class Tables {
 
         KING_MOVES   = new long[64];
         KNIGHT_MOVES = new long[64];
-        PAWN_PUSHES  = new long[3][64];
-        PAWN_ATTACKS = new long[3][64];
+        PAWN_PUSHES  = new long[2][64];
+        PAWN_ATTACKS = new long[2][64];
 
         RAYS         = new long[8][64];
         RAYS_BETWEEN = new long[64][64];

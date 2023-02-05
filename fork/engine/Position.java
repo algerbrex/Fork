@@ -1,17 +1,17 @@
 package fork.engine;
 
 public class Position {
-    public final static byte NO_TYPE = 0;
-    public final static byte PAWN    = 1;
-    public final static byte KNIGHT  = 2;
-    public final static byte BISHOP  = 3;
-    public final static byte ROOK    = 4;
-    public final static byte QUEEN   = 5;
-    public final static byte KING    = 6;
+    public final static byte PAWN    = 0;
+    public final static byte KNIGHT  = 1;
+    public final static byte BISHOP  = 2;
+    public final static byte ROOK    = 3;
+    public final static byte QUEEN   = 4;
+    public final static byte KING    = 5;
+    public final static byte NO_TYPE = 6;
 
-    public final static byte NO_COLOR = 0;
+    public final static byte BLACK    = 0;
     public final static byte WHITE    = 1;
-    public final static byte BLACK    = 2;
+    public final static byte NO_COLOR = 2;
     
     public final static byte WHITE_KS_RIGHT = 0x8;
     public final static byte WHITE_QS_RIGHT = 0x4;
@@ -38,8 +38,8 @@ public class Position {
 
     public Position() 
     {
-        pieces = new long[7];
-        sides = new long[3];
+        pieces = new long[6];
+        sides = new long[2];
         rights = stm = rule50 = epSq = 0;
     }
 
@@ -49,8 +49,8 @@ public class Position {
     }
 
     public void loadFEN(String fen) {
-        pieces = new long[7];
-        sides = new long[3];
+        pieces = new long[6];
+        sides = new long[2];
         rights = stm = rule50 = epSq = 0;
 
         String[] fields = fen.split("\\s");
@@ -175,7 +175,7 @@ public class Position {
                     if (capturedType != NO_TYPE) 
                         clearPiece(capturedType, capturedColor, to);
 
-                    putPiece((byte)(flag + 2), movedColor, to);
+                    putPiece((byte)(flag + 1), movedColor, to);
                 }
 
                 rule50 = 0;
@@ -219,15 +219,15 @@ public class Position {
         }
 
         rights = (byte)(rights & SPOILERS[from] & SPOILERS[to]);
-        stm = flipColor(stm);
+        stm ^= 1;
 
         if (inCheck ||
             from == currStmKingSq ||
             Bitboard.bitSet(pinned, from) || 
             (moveType == Move.ATTACK && flag == Move.ATTACK_EP)) 
         {
-            byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[flipColor(stm)]);
-            return !MoveGen.sqIsAttacked(this, flipColor(stm), kingSq);
+            byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[stm ^ 1]);
+            return !MoveGen.sqIsAttacked(this, (byte)(stm ^ 1), kingSq);
         }
 
         return true;
@@ -245,9 +245,10 @@ public class Position {
         long knightBB = (sqBB & pieces[KNIGHT]) >>> shift;
         long pawnBB   = (sqBB & pieces[PAWN]) >>> shift;
 
-        return (byte)(
-            kingBB*KING | queenBB*QUEEN | rookBB*ROOK | bishopBB*BISHOP | knightBB*KNIGHT | pawnBB*PAWN
-        ); 
+        long leastSignificantBit = kingBB | queenBB | rookBB | bishopBB | knightBB | pawnBB;
+        long pieceType = kingBB*KING | queenBB*QUEEN | rookBB*ROOK | bishopBB*BISHOP | knightBB*KNIGHT | pawnBB*PAWN;
+
+        return (byte)(pieceType | ((leastSignificantBit ^ 1) * NO_TYPE));
     }
 
     public byte getPieceColor(int sq) 
@@ -257,8 +258,11 @@ public class Position {
 
         long whiteBB  = (sqBB & sides[WHITE]) >>> shift;
         long blackBB  = (sqBB & sides[BLACK]) >>> shift;
+
+        long leastSignificantBit = whiteBB | blackBB;
+        long pieceColor = whiteBB*WHITE | blackBB*BLACK;
   
-        return (byte)(whiteBB*WHITE | blackBB*BLACK); 
+        return (byte)(pieceColor | ((leastSignificantBit ^ 1) * NO_COLOR));
     }
 
     public long getPinnedPieces(byte usColor) 
@@ -266,7 +270,7 @@ public class Position {
         byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[usColor]);
 
         long usBB = sides[usColor];
-        long enemyBB = sides[flipColor(usColor)];
+        long enemyBB = sides[usColor ^ 1];
 
         long enemyQueensAndRooks = enemyBB & (pieces[QUEEN] | pieces[ROOK]);
         long enemyQueensAndBishops = enemyBB & (pieces[QUEEN] | pieces[BISHOP]);
@@ -347,10 +351,5 @@ public class Position {
         boardStr += "\nrule 50: " + rule50;
 
         return boardStr;
-    }
-
-    public static byte flipColor(byte color)
-    {
-        return (byte)(~color & 0x3);
     }
 }

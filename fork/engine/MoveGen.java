@@ -9,7 +9,7 @@ public class MoveGen
     {
         MoveList moves = new MoveList();
         long usBB = pos.sides[pos.stm];
-        long enemyBB = pos.sides[Position.flipColor(pos.stm)];
+        long enemyBB = pos.sides[pos.stm ^ 1];
 
         genKnightMoves(pos.pieces[Position.KNIGHT] & usBB, enemyBB, usBB, moves);
         genKingMoves(pos.pieces[Position.KING] & usBB, enemyBB, usBB, moves);
@@ -30,7 +30,7 @@ public class MoveGen
 
     public static boolean sqIsAttacked(Position pos, byte usColor, byte sq) 
     {
-        long enemyBB = pos.sides[Position.flipColor(usColor)];
+        long enemyBB = pos.sides[usColor ^ 1];
         long usBB = pos.sides[usColor];
 
         long enemyKnights = pos.pieces[Position.KNIGHT] & enemyBB;
@@ -185,7 +185,7 @@ public class MoveGen
 
     private static void genCastlingMoves(Position pos, MoveList moves) 
     {
-        long allPieces = pos.sides[pos.stm] | pos.sides[Position.flipColor(pos.stm)];
+        long allPieces = pos.sides[pos.stm] | pos.sides[pos.stm ^ 1];
         if (pos.stm == Position.WHITE) 
         {
             if ((pos.rights & Position.WHITE_KS_RIGHT) != 0 && (allPieces & F1_G1) == 0)

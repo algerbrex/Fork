@@ -9,8 +9,6 @@ public class Evaluation
     public static final int QUEEN_VALUE  = 950;
 
     private static final int[][] PSQT = new int[][] {
-        {},
-
         // Pawn PSQT
         {
             50, 50, 50, 50, 50, 50, 50, 50,
@@ -85,34 +83,32 @@ public class Evaluation
     };
 
     private static final int[][] flipSq = new int[][]{
-        {},
-
         {
-            56, 57, 58, 59, 60, 61, 62, 63,
-            48, 49, 50, 51, 52, 53, 54, 55,
-            40, 41, 42, 43, 44, 45, 46, 47,
-            32, 33, 34, 35, 36, 37, 38, 39,
-            24, 25, 26, 27, 28, 29, 30, 31,
-            16, 17, 18, 19, 20, 21, 22, 23,
-            8,  9,  10, 11, 12, 13, 14, 15,
             0,  1,  2,  3,  4,  5,  6,  7,
+            8,  9,  10, 11, 12, 13, 14, 15,
+            16, 17, 18, 19, 20, 21, 22, 23,
+            24, 25, 26, 27, 28, 29, 30, 31,
+            32, 33, 34, 35, 36, 37, 38, 39,
+            40, 41, 42, 43, 44, 45, 46, 47,
+            48, 49, 50, 51, 52, 53, 54, 55,
+            56, 57, 58, 59, 60, 61, 62, 63,
         },
 
         {
-            0,  1,  2,  3,  4,  5,  6,  7,
-            8,  9,  10, 11, 12, 13, 14, 15,
-            16, 17, 18, 19, 20, 21, 22, 23,
-            24, 25, 26, 27, 28, 29, 30, 31,
-            32, 33, 34, 35, 36, 37, 38, 39,
-            40, 41, 42, 43, 44, 45, 46, 47,
-            48, 49, 50, 51, 52, 53, 54, 55,
             56, 57, 58, 59, 60, 61, 62, 63,
+            48, 49, 50, 51, 52, 53, 54, 55,
+            40, 41, 42, 43, 44, 45, 46, 47,
+            32, 33, 34, 35, 36, 37, 38, 39,
+            24, 25, 26, 27, 28, 29, 30, 31,
+            16, 17, 18, 19, 20, 21, 22, 23,
+            8,  9,  10, 11, 12, 13, 14, 15,
+            0,  1,  2,  3,  4,  5,  6,  7,
         }
     };
 
     public static int evaluate(Position pos) 
     {
-        int scores[] = new int[3];
+        int scores[] = new int[2];
         long allPieces = pos.sides[Position.WHITE] | pos.sides[Position.BLACK];
 
         while (allPieces != 0)
@@ -146,7 +142,7 @@ public class Evaluation
             }
         }
 
-        return scores[pos.stm] - scores[Position.flipColor(pos.stm)];
+        return scores[pos.stm] - scores[pos.stm ^ 1];
     }
 
     private static void scorePawn(int[] scores, int sq, byte pieceColor)
