@@ -81,7 +81,7 @@ public class MoveGenTest
             }
         }
 
-        System.out.printf("Testing completed in %d millseconds", System.currentTimeMillis() - startTime);
+        System.out.printf("Testing completed in %d millseconds\n", System.currentTimeMillis() - startTime);
         System.out.printf("%d tests were run, and %d were incorrect\n", numberOfTests, numberOfFailedTests);
     }
 }
