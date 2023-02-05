@@ -35,12 +35,14 @@ public class Position {
     public long[] pieces;
     public long[] sides;
     public byte rights, stm , epSq, rule50;
+    public long hash;
 
     public Position() 
     {
         pieces = new long[6];
         sides = new long[2];
         rights = stm = rule50 = epSq = 0;
+        hash = 0L;
     }
 
     public Position(String fen) 
@@ -97,6 +99,8 @@ public class Position {
                 case 'q': rights |= BLACK_QS_RIGHT; break;
             }
         }
+
+        hash = Zobrist.genHash(this);
     }
 
     public Position copy() 
@@ -110,6 +114,7 @@ public class Position {
         newPos.stm    = this.stm;
         newPos.epSq   = this.epSq;
         newPos.rule50 = this.rule50;
+        newPos.hash   = this.hash;
         
         return newPos;
     }
@@ -125,6 +130,8 @@ public class Position {
         byte movedColor = getPieceColor(from);
         
         rule50++;
+
+        hash ^= Zobrist.epNumber(epSq);
         epSq = Square.NO_SQ;
 
         switch (moveType)
@@ -218,8 +225,14 @@ public class Position {
                 break;
         }
 
+        hash ^= Zobrist.castlingNumber(rights);
+
         rights = (byte)(rights & SPOILERS[from] & SPOILERS[to]);
         stm ^= 1;
+
+        hash ^= Zobrist.castlingNumber(rights);
+        hash ^= Zobrist.epNumber(epSq);
+        hash ^= Zobrist.sideToMoveNumber();
 
         if (inCheck ||
             from == currStmKingSq ||
@@ -297,12 +310,14 @@ public class Position {
     {
         pieces[pieceType] = Bitboard.setBit(pieces[pieceType], sq);
         sides[pieceColor] = Bitboard.setBit(sides[pieceColor], sq);
+        hash ^= Zobrist.pieceNumber(pieceType, pieceColor, sq);
     }
 
     private void clearPiece(byte pieceType, byte pieceColor, byte sq) 
     {
         pieces[pieceType] = Bitboard.clearBit(pieces[pieceType], sq);
         sides[pieceColor] = Bitboard.clearBit(sides[pieceColor], sq);
+        hash ^= Zobrist.pieceNumber(pieceType, pieceColor, sq);
     }
 
     public String toString() 
@@ -349,6 +364,7 @@ public class Position {
 
         boardStr += "\nen passant: " + (epSq == Square.NO_SQ ? "none" : Square.sqToCoord(epSq));
         boardStr += "\nrule 50: " + rule50;
+        boardStr += "\nhash: " + String.format("%x", hash);
 
         return boardStr;
     }
