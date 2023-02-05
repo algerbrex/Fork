@@ -13,12 +13,12 @@ public class Search implements Runnable
     private long totalNodes;
     private long currSearchNodeCnt;
     private int[][] MVV_LVA = new int[][] {
-        {30, 31, 32, 33, 34},   // attacking pawn
-        {25, 26, 27, 28, 29},   // attacking knight
-        {20, 21, 22, 23, 24},   // attacking bishop
-        {15, 16, 17, 18, 19},   // attacking rook
-        {10, 11, 12, 13, 14},   // attacking queen
-        {5,  6,  7,  8,  9 },   // attacking king
+        {30, 31, 32, 33, 34, 0, 0},   // attacking pawn
+        {25, 26, 27, 28, 29, 0, 0},   // attacking knight
+        {20, 21, 22, 23, 24, 0, 0},   // attacking bishop
+        {15, 16, 17, 18, 19, 0, 0},   // attacking rook
+        {10, 11, 12, 13, 14, 0, 0},   // attacking queen
+        {5,  6,  7,  8,  9 , 0, 0},   // attacking king
     };
 
     private class PVLine 
