@@ -284,7 +284,7 @@ public class Search implements Runnable
         int bestMoveScore = Move.getScore(moves[index]);
         int bestMoveIndex = index;
 
-        for (int i = index; i < numMoves; i++)
+        for (int i = index + 1; i < numMoves; i++)
         {
             int moveScore = Move.getScore(moves[i]);
             if (moveScore > bestMoveScore) 
