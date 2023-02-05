@@ -19,7 +19,7 @@ public class Search implements Runnable
         {0, 20, 21, 22, 23, 24},   // attacking bishop
         {0, 15, 16, 17, 18, 19},   // attacking rook
         {0, 10, 11, 12, 13, 14},   // attacking queen
-        {0, 5,  6,  7,  8,  9 },        // attacking king
+        {0, 5,  6,  7,  8,  9 },   // attacking king
     };
 
     private class PVLine 
