@@ -1,6 +1,7 @@
 package fork.engine;
 
-import java.util.*;
+import java.util.Scanner;
+import java.util.Arrays;
 
 public class UCI 
 {
