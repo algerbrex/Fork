@@ -68,13 +68,14 @@ public class MoveGen
 
         byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
+        long pinned = pos.getPinnedPieces(pos.stm);
 
         for (int i = 0; i < moves.count; i++) 
         {
             int move = moves.moves[i];
             Position newPos = pos.copy();
 
-            if (newPos.makeMove(move, inCheck, kingSq)) 
+            if (newPos.makeMove(move, inCheck, kingSq, pinned)) 
             {
                 nodes += perft(newPos, (byte)(depth-1));
             }

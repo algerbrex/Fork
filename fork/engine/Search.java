@@ -151,6 +151,7 @@ public class Search implements Runnable
 
         byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
+        long pinned = pos.getPinnedPieces(pos.stm);
 
         MoveList moves = MoveGen.genAllMoves(pos);
 
@@ -168,7 +169,7 @@ public class Search implements Runnable
             int move = moves.moves[i];
             Position newPos = pos.copy();
 
-            if (!newPos.makeMove(move, inCheck, kingSq))
+            if (!newPos.makeMove(move, inCheck, kingSq, pinned))
                 continue;
 
             numLegalMoves++;
@@ -223,6 +224,7 @@ public class Search implements Runnable
 
         byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
+        long pinned = pos.getPinnedPieces(pos.stm);
 
         MoveList moves = MoveGen.genAllMoves(pos);
         PVLine childPV = new PVLine();
@@ -239,7 +241,7 @@ public class Search implements Runnable
             int move = moves.moves[i];
             Position newPos = pos.copy();
 
-            if (!newPos.makeMove(move, inCheck, kingSq))
+            if (!newPos.makeMove(move, inCheck, kingSq, pinned))
                 continue;
 
             int score = -quiescenceSearch(newPos, -alpha, -beta, childPV);

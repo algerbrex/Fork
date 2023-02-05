@@ -114,7 +114,7 @@ public class Position {
         return newPos;
     }
 
-    public boolean makeMove(int move, boolean inCheck, byte currStmKingSq) 
+    public boolean makeMove(int move, boolean inCheck, byte currStmKingSq, long pinned) 
     {
         byte from     = Move.getFromSq(move);
         byte to       = Move.getToSq(move);
@@ -126,8 +126,6 @@ public class Position {
         
         rule50++;
         epSq = Square.NO_SQ;
-
-        long pinned = getPinnedPieces(stm);
 
         switch (moveType)
         {
@@ -263,7 +261,7 @@ public class Position {
         return (byte)(whiteBB*WHITE | blackBB*BLACK); 
     }
 
-    private long getPinnedPieces(byte usColor) 
+    public long getPinnedPieces(byte usColor) 
     {
         byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[usColor]);
 

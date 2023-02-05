@@ -83,7 +83,7 @@ public class UCI
                     // are legal, so we're not going to waste time testing
                     // them even if they put the king in check or are king
                     // moves.
-                    search.pos.makeMove(move, false, Square.NO_SQ);
+                    search.pos.makeMove(move, false, Square.NO_SQ, 0L);
                 }
             }
         }
