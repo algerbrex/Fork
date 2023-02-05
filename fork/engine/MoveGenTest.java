@@ -64,6 +64,7 @@ public class MoveGenTest
         System.out.println("------------------------------------------------------------------------------\n");
 
         int numberOfTests = 0, numberOfFailedTests = 0;
+        long startTime = System.currentTimeMillis();
 
         for (TestData testData : testDatas)
         {
@@ -80,6 +81,7 @@ public class MoveGenTest
             }
         }
 
+        System.out.printf("Testing completed in %d millseconds", System.currentTimeMillis() - startTime);
         System.out.printf("%d tests were run, and %d were incorrect\n", numberOfTests, numberOfFailedTests);
     }
 }
