@@ -7,6 +7,7 @@ public class Search implements Runnable
     private final static int CHECKMATE_THRESHOLD = 9000;
     private final static int DRAW                = 0;
     private final static int MAX_PV_LENGTH       = 50;
+    private final static int MAX_GAME_PLY        = 700;
 
     public Position pos;
     public Timer timer;
@@ -20,6 +21,9 @@ public class Search implements Runnable
         {10, 11, 12, 13, 14, 0, 0},   // attacking queen
         {5,  6,  7,  8,  9 , 0, 0},   // attacking king
     };
+
+    private int zobristHistoryPly;
+    private long[] zobristHistory;
 
     private class PVLine 
     {
@@ -63,14 +67,22 @@ public class Search implements Runnable
 
     public Search() 
     {
-        pos = new Position(Position.START_FEN);
-        timer = new Timer();
+        setup(Position.START_FEN);
     }
 
     public Search(String fen) 
     {
+        setup(fen);
+    }
+
+    public void setup(String fen)
+    {
         pos = new Position(fen);
         timer = new Timer();
+
+        zobristHistoryPly = 0;
+        zobristHistory = new long[MAX_GAME_PLY];
+        zobristHistory[zobristHistoryPly] = pos.hash;
     }
 
     @Override
@@ -82,6 +94,17 @@ public class Search implements Runnable
     public void stopSearch()
     {
         timer.forceStop();
+    }
+
+    public void addHistory(long hash)
+    {
+        zobristHistoryPly++;
+        zobristHistory[zobristHistoryPly] = hash;
+    }
+
+    public void removeHistory()
+    {
+        zobristHistoryPly--;
     }
 
     public void search() 
@@ -151,6 +174,11 @@ public class Search implements Runnable
         byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
         long pinned = pos.getPinnedPieces(pos.stm);
+        boolean isRoot = ply == 0;
+
+        boolean possibleMateInOne = inCheck && ply == 1;
+        if (!isRoot && ((pos.rule50 == 100 && !possibleMateInOne) || posIsDrawByRepition(pos)))
+            return DRAW;
 
         MoveList moves = MoveGen.genAllMoves(pos);
 
@@ -171,9 +199,12 @@ public class Search implements Runnable
             if (!newPos.makeMove(move, inCheck, kingSq, pinned))
                 continue;
 
+            addHistory(newPos.hash);
             numLegalMoves++;
 
             int score = -negamax(newPos, depth - 1, ply + 1, -beta, -alpha, childPV);
+
+            removeHistory();
             
             if (score > bestScore)
                 bestScore = score;
@@ -261,6 +292,15 @@ public class Search implements Runnable
         }
 
         return bestScore;
+    }
+
+    private boolean posIsDrawByRepition(Position pos)
+    {
+        for (int i = 0; i < zobristHistoryPly; i++)
+            if (zobristHistory[i] == pos.hash)
+                return true;
+
+        return false;
     }
 
     private void scoreMoves(Position pos, int[] moves, int numMoves)

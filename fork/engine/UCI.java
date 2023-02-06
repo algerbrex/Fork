@@ -69,7 +69,7 @@ public class UCI
             command = String.join(" ", Arrays.copyOfRange(args, 6, args.length));
         }
 
-        search.pos.loadFEN(fenString);
+        search.setup(fenString);
 
         if (command.startsWith("moves")) 
         {
@@ -85,6 +85,7 @@ public class UCI
                     // them even if they put the king in check or are king
                     // moves.
                     search.pos.makeMove(move, false, Square.NO_SQ, 0L);
+                    search.addHistory(search.pos.hash);
                 }
             }
         }
@@ -141,7 +142,7 @@ public class UCI
 
         UCICommand();
         reset();
-        search.pos.loadFEN(Position.START_FEN);
+        search.setup(Position.START_FEN);
 
         boolean running = true;
 
