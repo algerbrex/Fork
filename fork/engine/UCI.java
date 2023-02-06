@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class UCI 
 {
-    private static final String ENGINE_NAME         = "Fork 0.1";
+    private static final String ENGINE_NAME         = "Fork";
     private static final String ENGINE_AUTHOR       = "Christian Dean";
     private static final String ENGINE_AUTHOR_EMAIL = "deanmchris@gmail.com";
 
