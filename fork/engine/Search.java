@@ -156,6 +156,12 @@ public class Search implements Runnable
         if (ply == MAX_PLY) 
             return Evaluation.evaluate(pos);
 
+        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
+        boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
+
+        if (inCheck)
+            depth++;
+
         if (depth == 0)
         {
             currSearchNodeCnt--;
@@ -171,8 +177,6 @@ public class Search implements Runnable
         if (timer.isStopped())
             return 0;
 
-        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
-        boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
         long pinned = pos.getPinnedPieces(pos.stm);
         boolean isRoot = ply == 0;
 
