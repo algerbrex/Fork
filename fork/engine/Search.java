@@ -260,16 +260,13 @@ public class Search implements Runnable
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
         long pinned = pos.getPinnedPieces(pos.stm);
 
-        MoveList moves = MoveGen.genAllMoves(pos);
+        MoveList moves = MoveGen.genAttacks(pos);
         PVLine childPV = new PVLine();
 
         scoreMoves(pos, moves.moves, moves.count);
 
         for (int i = 0; i < moves.count; i++)
         {
-            if (Move.getMoveType(moves.moves[i]) != Move.ATTACK)
-                continue; 
-
             swapBestMoveToIdx(moves.moves, moves.count, i);
 
             int move = moves.moves[i];

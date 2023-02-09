@@ -7,6 +7,12 @@ public class Bitboard
     final static long MSB      = 0x8000000000000000L;
     final static long EMPTY_BB = 0x0L;
     final static long FULL_BB  = ~0x0L;
+    final static long[] SQUARE_BB = new long[65];
+
+    static {
+        for (int i = 0; i < 64; i++)
+            SQUARE_BB[i] = MSB >>> i;
+    }
 
 
     public static long setBit(long bb, byte sq) 
