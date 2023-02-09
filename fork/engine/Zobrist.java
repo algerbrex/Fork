@@ -42,12 +42,12 @@ public class Zobrist {
         SIDE_TO_MOVE_RAND_64    = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE);
     }
 
-    public static long pieceNumber(byte pieceType, byte pieceColor, byte sq)
+    public static long pieceNumber(int pieceType, int pieceColor, int sq)
     {
-        return PIECE_SQ_RAND_64[((int)pieceType * 2 + (int)pieceColor) * 64 + (int)sq];
+        return PIECE_SQ_RAND_64[(pieceType * 2 + pieceColor) * 64 + sq];
     }
 
-    public static long epNumber(byte epSq)
+    public static long epNumber(int epSq)
     {
         return EP_FILE_RAND_64[(int)POSSIBLE_EP_FILES[epSq]];
     }
@@ -68,8 +68,8 @@ public class Zobrist {
 
         for (int i = 0; i < 64; i++)
         {
-            byte pieceType = pos.getPieceType(i);
-            byte pieceColor = pos.getPieceColor(i);
+            int pieceType = pos.getPieceType(i);
+            int pieceColor = pos.getPieceColor(i);
 
             if (pieceType != Position.NO_TYPE)
                 hash ^= Zobrist.pieceNumber(pieceType, pieceColor, (byte)i);

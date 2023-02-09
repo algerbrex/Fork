@@ -1,13 +1,13 @@
 package fork.engine;
 
 public class Position {
-    public final static byte PAWN    = 0;
-    public final static byte KNIGHT  = 1;
-    public final static byte BISHOP  = 2;
-    public final static byte ROOK    = 3;
-    public final static byte QUEEN   = 4;
-    public final static byte KING    = 5;
-    public final static byte NO_TYPE = 6;
+    public final static int PAWN    = 0;
+    public final static int KNIGHT  = 1;
+    public final static int BISHOP  = 2;
+    public final static int ROOK    = 3;
+    public final static int QUEEN   = 4;
+    public final static int KING    = 5;
+    public final static int NO_TYPE = 6;
 
     public final static byte BLACK    = 0;
     public final static byte WHITE    = 1;
@@ -62,7 +62,7 @@ public class Position {
         String activeEPSq        = fields[3];
         String halfMoveClock     = fields[4];
 
-        for (byte index = 0 , sq = 56; index < piecePlacement.length(); index++) 
+        for (int index = 0 , sq = 56; index < piecePlacement.length(); index++) 
         {
             char chr = piecePlacement.charAt(index);
             switch (chr) 
@@ -86,7 +86,7 @@ public class Position {
         }
 
         stm = activeColor.equals("w") ? WHITE : BLACK;
-        epSq = activeEPSq.equals("-") ? Square.NO_SQ : Square.coordToSq(activeEPSq);
+        epSq = activeEPSq.equals("-") ? (byte)Square.NO_SQ : (byte)Square.coordToSq(activeEPSq);
         rule50 = Byte.parseByte(halfMoveClock);
 
         for (int i = 0; i < castlingRights.length(); i++) 
@@ -119,15 +119,15 @@ public class Position {
         return newPos;
     }
 
-    public boolean makeMove(int move, boolean inCheck, byte currStmKingSq, long pinned) 
+    public boolean makeMove(int move, boolean inCheck, int currStmKingSq, long pinned) 
     {
-        byte from     = Move.getFromSq(move);
-        byte to       = Move.getToSq(move);
-        byte moveType = Move.getMoveType(move);
-        byte flag     = Move.getFlag(move);
+        int from     = Move.getFromSq(move);
+        int to       = Move.getToSq(move);
+        int moveType = Move.getMoveType(move);
+        int flag     = Move.getFlag(move);
 
-        byte movedType  = getPieceType(from);
-        byte movedColor = getPieceColor(from);
+        int movedType  = getPieceType(from);
+        int movedColor = getPieceColor(from);
         
         rule50++;
 
@@ -152,9 +152,9 @@ public class Position {
                 {
                     if (flag == Move.ATTACK_EP) 
                     {
-                        byte captureSq = (byte)(stm == WHITE ? to - 8 : to + 8);
-                        byte capturedType  = getPieceType(captureSq);
-                        byte capturedColor = getPieceColor(captureSq);
+                        int captureSq = stm == WHITE ? to - 8 : to + 8;
+                        int capturedType  = getPieceType(captureSq);
+                        int capturedColor = getPieceColor(captureSq);
 
                         clearPiece(capturedType, capturedColor, captureSq);
                         clearPiece(movedType, movedColor, from);
@@ -162,8 +162,8 @@ public class Position {
                     } 
                     else 
                     {
-                        byte capturedType  = getPieceType(to);
-                        byte capturedColor = getPieceColor(to);
+                        int capturedType  = getPieceType(to);
+                        int capturedColor = getPieceColor(to);
                         clearPiece(capturedType, capturedColor, to);
                         clearPiece(movedType, movedColor, from);
                         putPiece(movedType, movedColor, to);
@@ -174,15 +174,15 @@ public class Position {
                 break;
             case Move.PROMOTION:
                 {
-                    byte capturedType  = getPieceType(to);
-                    byte capturedColor = getPieceColor(to);
+                    int capturedType  = getPieceType(to);
+                    int capturedColor = getPieceColor(to);
 
                     clearPiece(movedType, movedColor, from);
 
                     if (capturedType != NO_TYPE) 
                         clearPiece(capturedType, capturedColor, to);
 
-                    putPiece((byte)(flag + 1), movedColor, to);
+                    putPiece(flag + 1, movedColor, to);
                 }
 
                 rule50 = 0;
@@ -191,8 +191,8 @@ public class Position {
                 clearPiece(movedType, movedColor, from);
                 putPiece(movedType, movedColor, to);
 
-                byte rookFrom = 0, rookTo = 0;
-                byte firstSqCrossed = 0, secondSqCrossed = 0;
+                int rookFrom = 0, rookTo = 0;
+                int firstSqCrossed = 0, secondSqCrossed = 0;
                 switch(to) 
                 {
                     case Square.G1: 
@@ -239,14 +239,14 @@ public class Position {
             Bitboard.bitSet(pinned, from) || 
             (moveType == Move.ATTACK && flag == Move.ATTACK_EP)) 
         {
-            byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[stm ^ 1]);
-            return !MoveGen.sqIsAttacked(this, (byte)(stm ^ 1), kingSq);
+            int kingSq = Bitboard.findMSBPos(pieces[KING] & sides[stm ^ 1]);
+            return !MoveGen.sqIsAttacked(this, stm ^ 1, kingSq);
         }
 
         return true;
     }
 
-    public byte getPieceType(int sq) 
+    public int getPieceType(int sq) 
     {
         long sqBB = Bitboard.MSB >>> sq;
         int shift = 63 - sq;
@@ -261,10 +261,10 @@ public class Position {
         long leastSignificantBit = kingBB | queenBB | rookBB | bishopBB | knightBB | pawnBB;
         long pieceType = kingBB*KING | queenBB*QUEEN | rookBB*ROOK | bishopBB*BISHOP | knightBB*KNIGHT | pawnBB*PAWN;
 
-        return (byte)(pieceType | ((leastSignificantBit ^ 1) * NO_TYPE));
+        return (int)(pieceType | ((leastSignificantBit ^ 1) * NO_TYPE));
     }
 
-    public byte getPieceColor(int sq) 
+    public int getPieceColor(int sq) 
     {
         long sqBB = Bitboard.MSB >>> sq;
         int shift = 63 - sq;
@@ -275,12 +275,12 @@ public class Position {
         long leastSignificantBit = whiteBB | blackBB;
         long pieceColor = whiteBB*WHITE | blackBB*BLACK;
   
-        return (byte)(pieceColor | ((leastSignificantBit ^ 1) * NO_COLOR));
+        return (int)(pieceColor | ((leastSignificantBit ^ 1) * NO_COLOR));
     }
 
-    public long getPinnedPieces(byte usColor) 
+    public long getPinnedPieces(int usColor) 
     {
-        byte kingSq = Bitboard.findMSBPos(pieces[KING] & sides[usColor]);
+        int kingSq = Bitboard.findMSBPos(pieces[KING] & sides[usColor]);
 
         long usBB = sides[usColor];
         long enemyBB = sides[usColor ^ 1];
@@ -297,7 +297,7 @@ public class Position {
 
         while (potentialPinners != 0)
         {
-            byte pinnerSq = Bitboard.findMSBPos(potentialPinners);
+            int pinnerSq = Bitboard.findMSBPos(potentialPinners);
             potentialPinners = Bitboard.clearBit(potentialPinners, pinnerSq);
 
             pinned |= usBB & (Tables.RAYS_BETWEEN[kingSq][pinnerSq]);
@@ -306,14 +306,14 @@ public class Position {
         return pinned;
     }
 
-    private void putPiece(byte pieceType, byte pieceColor, byte sq) 
+    private void putPiece(int pieceType, int pieceColor, int sq) 
     {
         pieces[pieceType] = Bitboard.setBit(pieces[pieceType], sq);
         sides[pieceColor] = Bitboard.setBit(sides[pieceColor], sq);
         hash ^= Zobrist.pieceNumber(pieceType, pieceColor, sq);
     }
 
-    private void clearPiece(byte pieceType, byte pieceColor, byte sq) 
+    private void clearPiece(int pieceType, int pieceColor, int sq) 
     {
         pieces[pieceType] = Bitboard.clearBit(pieces[pieceType], sq);
         sides[pieceColor] = Bitboard.clearBit(sides[pieceColor], sq);
@@ -328,8 +328,8 @@ public class Position {
         {
             boardStr += (i/8 + 1) + "|";
             for (int j = i; j < i + 8; j++) {
-                byte pieceType = getPieceType(j);
-                byte pieceColor = getPieceColor(j);
+                int pieceType = getPieceType(j);
+                int pieceColor = getPieceColor(j);
 
                 char pieceChar = switch(pieceType) 
                 {

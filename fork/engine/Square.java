@@ -1,7 +1,7 @@
 package fork.engine;
 
 public class Square {
-    public static final byte 
+    public static final int 
     A1 = 0, B1 = 1, C1 = 2, D1 = 3, E1 = 4, F1 = 5, G1 = 6, H1 = 7,
 	A2 = 8, B2 = 9, C2 = 10, D2 = 11, E2 = 12, F2 = 13, G2 = 14, H2 = 15,
 	A3 = 16, B3 = 17, C3 = 18, D3 = 19, E3 = 20, F3 = 21, G3 = 22, H3 = 23,
@@ -12,24 +12,24 @@ public class Square {
 	A8 = 56, B8 = 57, C8 = 58, D8 = 59, E8 = 60, F8 = 61, G8 = 62, H8 = 63,
     NO_SQ = 64;
 
-    public static byte coordToSq(String coord) 
+    public static int coordToSq(String coord) 
     {
-        byte file = (byte)(coord.charAt(0) - 'a');
-        byte rank = (byte)(coord.charAt(1) - '0' - 1);
-        return (byte)(rank * 8 + file);
+        int file = coord.charAt(0) - 'a';
+        int rank = coord.charAt(1) - '0' - 1;
+        return rank * 8 + file;
     }
 
-    public static String sqToCoord(byte sq) {
-        byte file = fileOf(sq);
-        byte rank = rankOf(sq);
+    public static String sqToCoord(int sq) {
+        int file = fileOf(sq);
+        int rank = rankOf(sq);
         return (char)('a' + file) + "" + (char)('0'+ rank + 1);
     }
 
-    public static byte fileOf(byte sq) {
-        return (byte)(sq % 8);
+    public static int fileOf(int sq) {
+        return sq % 8;
     }
 
-    public static byte rankOf(byte sq) {
-        return (byte)(sq / 8);
+    public static int rankOf(int sq) {
+        return sq / 8;
     }
 }

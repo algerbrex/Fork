@@ -14,25 +14,24 @@ public class Bitboard
             SQUARE_BB[i] = MSB >>> i;
     }
 
-
-    public static long setBit(long bb, byte sq) 
+    public static long setBit(long bb, int sq) 
     {
         return bb | (MSB >>> sq);
     }
 
-    public static long clearBit(long bb, byte sq) 
+    public static long clearBit(long bb, int sq) 
     {
         return bb & ~(MSB >>> sq);
     }
 
-    public static boolean bitSet(long bb, byte sq) 
+    public static boolean bitSet(long bb, int sq) 
     {
         return (bb & (MSB >>> sq)) != 0;
     }
 
-    public static byte findMSBPos(long bb) 
+    public static int findMSBPos(long bb) 
     {
-        return (byte)Long.numberOfLeadingZeros(bb);
+        return Long.numberOfLeadingZeros(bb);
     }
 
     public static void printBitboard(long bb) 

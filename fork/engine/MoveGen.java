@@ -50,7 +50,7 @@ public class MoveGen
         return moves;
     }
 
-    public static boolean sqIsAttacked(Position pos, byte usColor, byte sq) 
+    public static boolean sqIsAttacked(Position pos, int usColor, int sq) 
     {
         long enemyBB = pos.sides[usColor ^ 1];
         long usBB = pos.sides[usColor];
@@ -80,7 +80,7 @@ public class MoveGen
         return false;
     }
 
-    public static long perft(Position pos, byte depth) 
+    public static long perft(Position pos, int depth) 
     {
         if (depth == 0)
             return 1L;
@@ -88,7 +88,7 @@ public class MoveGen
         MoveList moves = genAllMoves(pos);
         long nodes = 0L;
 
-        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
+        int kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
         long pinned = pos.getPinnedPieces(pos.stm);
 
@@ -99,7 +99,7 @@ public class MoveGen
 
             if (newPos.makeMove(move, inCheck, kingSq, pinned)) 
             {
-                nodes += perft(newPos, (byte)(depth-1));
+                nodes += perft(newPos, depth - 1);
             }
         }
         return nodes;
@@ -109,7 +109,7 @@ public class MoveGen
     {
         while (knightBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(knightBB);
+            int from = Bitboard.findMSBPos(knightBB);
             knightBB = Bitboard.clearBit(knightBB, from);
             genMovesFromBB(Tables.KNIGHT_MOVES[from] & ~usBB & filter, enemyBB, from, moves);
         }
@@ -119,7 +119,7 @@ public class MoveGen
     {
         while (kingBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(kingBB);
+            int from = Bitboard.findMSBPos(kingBB);
             kingBB = Bitboard.clearBit(kingBB, from);
             genMovesFromBB(Tables.KING_MOVES[from] & ~usBB & filter, enemyBB, from, moves);
         }
@@ -129,7 +129,7 @@ public class MoveGen
     {
         while (rookBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(rookBB);
+            int from = Bitboard.findMSBPos(rookBB);
             rookBB = Bitboard.clearBit(rookBB, from);
             genMovesFromBB(genRookMovesBB(from, enemyBB|usBB) & ~usBB & filter, enemyBB, from, moves);
         }
@@ -139,7 +139,7 @@ public class MoveGen
     {
         while (bishopBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(bishopBB);
+            int from = Bitboard.findMSBPos(bishopBB);
             bishopBB = Bitboard.clearBit(bishopBB, from);
             genMovesFromBB(genBishopMovesBB(from, enemyBB|usBB) & ~usBB & filter, enemyBB, from, moves);
         }
@@ -149,7 +149,7 @@ public class MoveGen
     {
         while (queenBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(queenBB);
+            int from = Bitboard.findMSBPos(queenBB);
             queenBB = Bitboard.clearBit(queenBB, from);
             genMovesFromBB(
                 (genRookMovesBB(from, enemyBB|usBB) | genBishopMovesBB(from, enemyBB|usBB)) & ~usBB & filter, 
@@ -158,11 +158,11 @@ public class MoveGen
         }
     }
 
-    private static void genPawnMoves(long pawnBB, long enemyBB, long usBB, byte stm, byte epSq, MoveList moves) 
+    private static void genPawnMoves(long pawnBB, long enemyBB, long usBB, byte stm, int epSq, MoveList moves) 
     {
         while (pawnBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(pawnBB);
+            int from = Bitboard.findMSBPos(pawnBB);
             pawnBB = Bitboard.clearBit(pawnBB, from);
 
             long pawnOnePush = Tables.PAWN_PUSHES[stm][from] & ~(usBB | enemyBB);
@@ -178,7 +178,7 @@ public class MoveGen
 
             while (pawnPush != 0) 
             {
-                byte to = Bitboard.findMSBPos(pawnPush);
+                int to = Bitboard.findMSBPos(pawnPush);
                 pawnPush = Bitboard.clearBit(pawnPush, to);
 
                 if (isPromoting(stm, to))
@@ -189,7 +189,7 @@ public class MoveGen
 
             while (pawnAttacks != 0) 
             {
-                byte to = Bitboard.findMSBPos(pawnAttacks);
+                int to = Bitboard.findMSBPos(pawnAttacks);
                 pawnAttacks = Bitboard.clearBit(pawnAttacks, to);
 
                 if (to == epSq)
@@ -205,17 +205,17 @@ public class MoveGen
         }   
     }
 
-    private static void genPawnAttackMoves(long pawnBB, long enemyBB, long usBB, byte stm, byte epSq, MoveList moves) 
+    private static void genPawnAttackMoves(long pawnBB, long enemyBB, long usBB, byte stm, int epSq, MoveList moves) 
     {
         while (pawnBB != 0) 
         {
-            byte from = Bitboard.findMSBPos(pawnBB);
+            int from = Bitboard.findMSBPos(pawnBB);
             pawnBB = Bitboard.clearBit(pawnBB, from);
             long pawnAttacks = Tables.PAWN_ATTACKS[stm][from] & (enemyBB | Bitboard.SQUARE_BB[epSq]);
 
             while (pawnAttacks != 0) 
             {
-                byte to = Bitboard.findMSBPos(pawnAttacks);
+                int to = Bitboard.findMSBPos(pawnAttacks);
                 pawnAttacks = Bitboard.clearBit(pawnAttacks, to);
 
                 if (to == epSq)
@@ -250,30 +250,29 @@ public class MoveGen
         }
     }
 
-    private static boolean isPromoting(byte stm, byte to) {
+    private static boolean isPromoting(byte stm, int to) {
         return stm == Position.WHITE ? to >= 56 && to <= 63 : to <= 7;
     }
     
-    private static void genPromotionMoves(byte from, byte to, MoveList moves) {
+    private static void genPromotionMoves(int from, int to, MoveList moves) {
         moves.addMove(Move.makeMove(from, to, Move.PROMOTION, Move.KNIGHT_PROMO));
         moves.addMove(Move.makeMove(from, to, Move.PROMOTION, Move.BISHOP_PROMO));
         moves.addMove(Move.makeMove(from, to, Move.PROMOTION, Move.ROOK_PROMO));
         moves.addMove(Move.makeMove(from, to, Move.PROMOTION, Move.QUEEN_PROMO));
     } 
 
-    private static void genMovesFromBB(long movesBB, long enemyBB, byte from, MoveList moves) 
+    private static void genMovesFromBB(long movesBB, long enemyBB, int from, MoveList moves) 
     {
         while (movesBB != 0) 
         {
-            byte to = Bitboard.findMSBPos(movesBB);
+            int to = Bitboard.findMSBPos(movesBB);
             movesBB = Bitboard.clearBit(movesBB, to);
-
-            byte moveType = ((Bitboard.MSB >>> to) & enemyBB) == 0 ? Move.QUIET : Move.ATTACK;
+            int moveType = ((Bitboard.MSB >>> to) & enemyBB) == 0 ? Move.QUIET : Move.ATTACK;
             moves.addMove(Move.makeMove(from, to, moveType, Move.NO_FLAG));
         }
     }
 
-    public static long genRookMovesBB(byte from, long blockers) 
+    public static long genRookMovesBB(int from, long blockers) 
     {
         MagicSqInfo magic = Magic.ROOK_MAGICS[from];
         blockers &= magic.blockerMask;
@@ -281,7 +280,7 @@ public class MoveGen
         return Magic.ROOK_MOVES[from][(int)index];
     }
 
-    public static long genBishopMovesBB(byte from, long blockers) 
+    public static long genBishopMovesBB(int from, long blockers) 
     {
         MagicSqInfo magic = Magic.BISHOP_MAGICS[from];
         blockers &= magic.blockerMask;

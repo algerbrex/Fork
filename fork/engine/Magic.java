@@ -8,7 +8,7 @@ public class Magic {
 
     public static final long[] MAGIC_SEEDS = {728, 10316, 55013, 32803, 12281, 15100, 16645, 255};
 
-    private static long genRookMovesHQ(byte sq, long occupied, boolean genMask) 
+    private static long genRookMovesHQ(int sq, long occupied, boolean genMask) 
     {
         long sliderBB = Bitboard.MSB >>> sq;    
         long fileMask = Tables.MASK_FILE[Square.fileOf(sq)];
@@ -31,7 +31,7 @@ public class Magic {
         return northSouthMoves | eastWestMoves;
     }
 
-    private static long genBishopMovesHQ(byte sq, long occupied, boolean genMask) 
+    private static long genBishopMovesHQ(int sq, long occupied, boolean genMask) 
     {
         long sliderBB = Bitboard.MSB >>> sq;    
         long diagonalMask = Tables.MASK_DIAGONAL[Square.fileOf(sq)-Square.rankOf(sq)+7];
@@ -80,14 +80,12 @@ public class Magic {
 
         PRNG prng = new PRNG();
 
-        // Generate rook magic numbers and moves.
-
         for (int sq = 0; sq < 64; sq++) 
         {
             MagicSqInfo magic = new MagicSqInfo();
-            long blockerMask  = genRookMovesHQ((byte)sq, 0L, true);
+            long blockerMask  = genRookMovesHQ(sq, 0L, true);
             int noBitsSetHigh = Long.bitCount(blockerMask);
-            byte shift = (byte)(64 - noBitsSetHigh);
+            int shift = 64 - noBitsSetHigh;
 
             magic.blockerMask = blockerMask;
             magic.shift = shift;
@@ -97,10 +95,10 @@ public class Magic {
 
             for (int i = 0; i < (1 << noBitsSetHigh); i++)
             {
-                subsetMoves[i] = genRookMovesHQ((byte)sq, subsets[i], false);
+                subsetMoves[i] = genRookMovesHQ(sq, subsets[i], false);
             }
 
-            prng.seed(MAGIC_SEEDS[Square.rankOf((byte)sq)]);
+            prng.seed(MAGIC_SEEDS[Square.rankOf(sq)]);
             boolean searching = true;
 
             while (searching)
@@ -133,14 +131,12 @@ public class Magic {
             ROOK_MAGICS[sq] = magic;
         } 
 
-        // Generate bishop magic numbers and moves.
-
         for (int sq = 0; sq < 64; sq++) 
         {
             MagicSqInfo magic = new MagicSqInfo();
-            long blockerMask  = genBishopMovesHQ((byte)sq, 0L, true);
+            long blockerMask  = genBishopMovesHQ(sq, 0L, true);
             int noBitsSetHigh = Long.bitCount(blockerMask);
-            byte shift = (byte)(64 - noBitsSetHigh);
+            int shift = 64 - noBitsSetHigh;
 
             magic.blockerMask = blockerMask;
             magic.shift = shift;
@@ -150,10 +146,10 @@ public class Magic {
 
             for (int i = 0; i < (1 << noBitsSetHigh); i++)
             {
-                subsetMoves[i] = genBishopMovesHQ((byte)sq, subsets[i], false);
+                subsetMoves[i] = genBishopMovesHQ(sq, subsets[i], false);
             }
 
-            prng.seed(MAGIC_SEEDS[Square.rankOf((byte)sq)]);
+            prng.seed(MAGIC_SEEDS[Square.rankOf(sq)]);
             boolean searching = true;
 
             while (searching)

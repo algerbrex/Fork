@@ -52,26 +52,26 @@ public class Tables {
     public static final long[][] RAYS;
     public static final long[][] RAYS_BETWEEN;
 
-    public static final byte RANK_1 = 0, FILE_A = 0;
-    public static final byte RANK_2 = 1, FILE_B = 1;
-    public static final byte RANK_3 = 2, FILE_C = 2;
-    public static final byte RANK_4 = 3, FILE_D = 3;
-    public static final byte RANK_5 = 4, FILE_E = 4;
-    public static final byte RANK_6 = 5, FILE_F = 5;
-    public static final byte RANK_7 = 6, FILE_G = 6;
-    public static final byte RANK_8 = 7, FILE_H = 7;
+    public static final int RANK_1 = 0, FILE_A = 0;
+    public static final int RANK_2 = 1, FILE_B = 1;
+    public static final int RANK_3 = 2, FILE_C = 2;
+    public static final int RANK_4 = 3, FILE_D = 3;
+    public static final int RANK_5 = 4, FILE_E = 4;
+    public static final int RANK_6 = 5, FILE_F = 5;
+    public static final int RANK_7 = 6, FILE_G = 6;
+    public static final int RANK_8 = 7, FILE_H = 7;
 
-    public static final byte NORTH = 8, SOUTH = 8;
-    public static final byte EAST  = 1, WEST  = 1;
+    public static final int NORTH = 8, SOUTH = 8;
+    public static final int EAST  = 1, WEST  = 1;
     
-    public static final byte NORTH_DIR      = 0;
-    public static final byte SOUTH_DIR      = 1;
-    public static final byte EAST_DIR       = 2;
-    public static final byte WEST_DIR       = 3;
-    public static final byte NORTH_EAST_DIR = 4;
-    public static final byte NORTH_WEST_DIR = 5;
-    public static final byte SOUTH_EAST_DIR = 6;
-    public static final byte SOUTH_WEST_DIR = 7;
+    public static final int NORTH_DIR      = 0;
+    public static final int SOUTH_DIR      = 1;
+    public static final int EAST_DIR       = 2;
+    public static final int WEST_DIR       = 3;
+    public static final int NORTH_EAST_DIR = 4;
+    public static final int NORTH_WEST_DIR = 5;
+    public static final int SOUTH_EAST_DIR = 6;
+    public static final int SOUTH_WEST_DIR = 7;
 
 
 
@@ -98,8 +98,8 @@ public class Tables {
 
             for (int j = i; j <= 63; j += 8) 
             {
-                emptyBB = Bitboard.setBit(emptyBB, (byte)j);
-                fullBB = Bitboard.clearBit(fullBB, (byte)j);
+                emptyBB = Bitboard.setBit(emptyBB, j);
+                fullBB = Bitboard.clearBit(fullBB, j);
             }
 
             MASK_FILE[i] = emptyBB;
@@ -113,8 +113,8 @@ public class Tables {
 
             for (int j = i; j < i + 8; j++) 
             {
-                emptyBB = Bitboard.setBit(emptyBB, (byte)j);
-                fullBB = Bitboard.clearBit(fullBB, (byte)j);
+                emptyBB = Bitboard.setBit(emptyBB, j);
+                fullBB = Bitboard.clearBit(fullBB, j);
             }
 
             MASK_RANK[i / 8] = emptyBB;
@@ -228,7 +228,7 @@ public class Tables {
 
         for (int sq1 = 0; sq1 < 64; sq1++) 
         {
-            for (byte direction = NORTH_DIR; direction <= SOUTH_WEST_DIR; direction++) 
+            for (int direction = NORTH_DIR; direction <= SOUTH_WEST_DIR; direction++) 
             {
                 long ray = RAYS[direction][sq1];
                 for (int sq2 = 0; sq2 < 64; sq2++) 

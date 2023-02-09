@@ -5,7 +5,7 @@ public class MoveList
     private static final int MAX_MOVES = 255;
 
     public int[] moves;
-    public byte count;
+    public int count;
 
     public MoveList() 
     {

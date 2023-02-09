@@ -14,10 +14,10 @@ public class MoveGenTest
     private static class TestData
     {
         public String fen;
-        public byte depth;
+        public int depth;
         public long expectedNodeCount;
 
-        public TestData(String fen, byte depth, long expectedNodeCount)
+        public TestData(String fen, int depth, long expectedNodeCount)
         {
             this.fen = fen;
             this.depth = depth;
@@ -43,7 +43,7 @@ public class MoveGenTest
             for (int i = 1; i < fields.length; i ++)
             {
                 String field = fields[i].trim();
-                byte depth = (byte)Integer.parseInt(field.substring(1, 2));
+                int depth = Integer.parseInt(field.substring(1, 2));
                 long expectedNodeCount = Long.parseLong(field.split("\\s")[1]);
                 testDatas.add(new TestData(fen, depth, expectedNodeCount));
             }

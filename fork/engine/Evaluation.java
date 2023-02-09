@@ -113,11 +113,11 @@ public class Evaluation
 
         while (allPieces != 0)
         {
-            byte sq = Bitboard.findMSBPos(allPieces);
+            int sq = Bitboard.findMSBPos(allPieces);
             allPieces = Bitboard.clearBit(allPieces, sq);
 
-            byte pieceType = pos.getPieceType(sq);
-            byte pieceColor = pos.getPieceColor(sq);
+            int pieceType = pos.getPieceType(sq);
+            int pieceColor = pos.getPieceColor(sq);
 
             switch (pieceType) 
             {
@@ -145,34 +145,37 @@ public class Evaluation
         return scores[pos.stm] - scores[pos.stm ^ 1];
     }
 
-    private static void scorePawn(int[] scores, int sq, byte pieceColor)
+    private static void scorePawn(int[] scores, int sq, int pieceColor)
     {
         scores[pieceColor] += PAWN_VALUE;
         scores[pieceColor] += PSQT[Position.PAWN][flipSq[pieceColor][sq]];
     }
 
-    private static void scoreKnight(int[] scores, int sq, byte pieceColor)
+    private static void scoreKnight(int[] scores, int sq, int pieceColor)
     {
         scores[pieceColor] += KNIGHT_VALUE;
         scores[pieceColor] += PSQT[Position.KNIGHT][flipSq[pieceColor][sq]];
     }
 
-    private static void scoreBishop(int[] scores, int sq, byte pieceColor)
+    private static void scoreBishop(int[] scores, int sq, int pieceColor)
     {
         scores[pieceColor] += BISHOP_VALUE;
         scores[pieceColor] += PSQT[Position.BISHOP][flipSq[pieceColor][sq]];
     }
-    private static void scoreRook(int[] scores, int sq, byte pieceColor)
+
+    private static void scoreRook(int[] scores, int sq, int pieceColor)
     {
         scores[pieceColor] += ROOK_VALUE;
         scores[pieceColor] += PSQT[Position.BISHOP][flipSq[pieceColor][sq]];
     }
-    private static void scoreQueen(int[] scores, int sq, byte pieceColor)
+
+    private static void scoreQueen(int[] scores, int sq, int pieceColor)
     {
         scores[pieceColor] += QUEEN_VALUE;
         scores[pieceColor] += PSQT[Position.QUEEN][flipSq[pieceColor][sq]];
     }
-    private static void scoreKing(int[] scores, int sq,  byte pieceColor)
+    
+    private static void scoreKing(int[] scores, int sq, int pieceColor)
     {
         scores[pieceColor] += PSQT[Position.KING][flipSq[pieceColor][sq]];
     }

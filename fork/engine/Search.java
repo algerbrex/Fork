@@ -156,7 +156,7 @@ public class Search implements Runnable
         if (ply == MAX_PLY) 
             return Evaluation.evaluate(pos);
 
-        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
+        int kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
 
         if (inCheck)
@@ -256,7 +256,7 @@ public class Search implements Runnable
         if (alpha < bestScore)
             alpha = bestScore;
 
-        byte kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
+        int kingSq = Bitboard.findMSBPos(pos.pieces[Position.KING] & pos.sides[pos.stm]);
         boolean inCheck = MoveGen.sqIsAttacked(pos, pos.stm, kingSq);
         long pinned = pos.getPinnedPieces(pos.stm);
 
@@ -313,7 +313,7 @@ public class Search implements Runnable
             if (Move.getMoveType(moves[i]) == Move.ATTACK)
             {
                 int from = Move.getFromSq(move), to = Move.getToSq(move);
-                byte attackerType = pos.getPieceType(from), attackedType = pos.getPieceType(to);
+                int attackerType = pos.getPieceType(from), attackedType = pos.getPieceType(to);
                 moves[i] = Move.addScore(move, MVV_LVA[attackerType][attackedType]);
             }
         }

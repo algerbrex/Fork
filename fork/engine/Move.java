@@ -1,49 +1,49 @@
 package fork.engine;
 
 public class Move {
-    public final static byte QUIET     = 0;
-    public final static byte ATTACK    = 1;
-    public final static byte CASTLE    = 2;
-    public final static byte PROMOTION = 3;
+    public final static int QUIET     = 0;
+    public final static int ATTACK    = 1;
+    public final static int CASTLE    = 2;
+    public final static int PROMOTION = 3;
 
-    public final static byte KNIGHT_PROMO = 0;
-    public final static byte BISHOP_PROMO = 1;
-    public final static byte ROOK_PROMO   = 2;
-    public final static byte QUEEN_PROMO  = 3;
+    public final static int KNIGHT_PROMO = 0;
+    public final static int BISHOP_PROMO = 1;
+    public final static int ROOK_PROMO   = 2;
+    public final static int QUEEN_PROMO  = 3;
 
-    public final static byte ATTACK_EP = 1;
-    public final static byte NO_FLAG   = 0;
+    public final static int ATTACK_EP = 1;
+    public final static int NO_FLAG   = 0;
 
     public final static int NULL_MOVE = 0;
 
-    public static int makeMove(byte from, byte to, byte moveType, byte flag) 
+    public static int makeMove(int from, int to, int moveType, int flag) 
     {
-        return (int)(from) << 26 | (int)(to) << 20 | (int)(moveType) << 18 | (int)(flag) << 16;
+        return from << 26 | to << 20 | moveType << 18 | flag << 16;
     }
 
-    public static byte getFromSq(int move) 
+    public static int getFromSq(int move) 
     {
-        return (byte)((move & 0xfc000000) >>> 26);
+        return (move & 0xfc000000) >>> 26;
     } 
 
-    public static byte getToSq(int move) 
+    public static int getToSq(int move) 
     {
-        return (byte)((move & 0x3f00000) >> 20);
+        return (move & 0x3f00000) >> 20;
     } 
 
-    public static byte getMoveType(int move) 
+    public static int getMoveType(int move) 
     {
-        return (byte)((move & 0xc0000) >> 18);
+        return (move & 0xc0000) >> 18;
     } 
 
-    public static byte getFlag(int move) 
+    public static int getFlag(int move) 
     {
-        return (byte)((move & 0x30000) >> 16);
+        return(move & 0x30000) >> 16;
     } 
 
-    public static short getScore(int move) 
+    public static int getScore(int move) 
     {
-        return (short)(move & 0xffff);
+        return move & 0xffff;
     } 
 
     public static int addScore(int move, int score) 
@@ -58,12 +58,12 @@ public class Move {
 
     public static int moveFromCoord(Position pos, String coord)
     {
-        byte from = Square.coordToSq(coord.substring(0, 2));
-        byte to   = Square.coordToSq(coord.substring(2, 4));
-        byte movedType = pos.getPieceType(from);
+        int from = Square.coordToSq(coord.substring(0, 2));
+        int to   = Square.coordToSq(coord.substring(2, 4));
+        int movedType = pos.getPieceType(from);
 
-        byte moveType = 0;
-        byte flag = Move.NO_FLAG;
+        int moveType = 0;
+        int flag = Move.NO_FLAG;
 
         if (coord.length() == 5)
         {
@@ -98,10 +98,10 @@ public class Move {
 
     public static String toString(int move) 
     {
-        byte from     = getFromSq(move);
-        byte to       = getToSq(move);
-        byte moveType = getMoveType(move);
-        byte flag     = getFlag(move);
+        int from     = getFromSq(move);
+        int to       = getToSq(move);
+        int moveType = getMoveType(move);
+        int flag     = getFlag(move);
 
         String promoType = "";
         if (moveType == PROMOTION) 
