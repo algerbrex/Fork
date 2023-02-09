@@ -117,12 +117,9 @@ public class MoveGen
 
     private static void genKingMoves(long kingBB, long filter, long enemyBB, long usBB, MoveList moves) 
     {
-        while (kingBB != 0) 
-        {
-            int from = Bitboard.findMSBPos(kingBB);
-            kingBB = Bitboard.clearBit(kingBB, from);
-            genMovesFromBB(Tables.KING_MOVES[from] & ~usBB & filter, enemyBB, from, moves);
-        }
+        int from = Bitboard.findMSBPos(kingBB);
+        kingBB = Bitboard.clearBit(kingBB, from);
+        genMovesFromBB(Tables.KING_MOVES[from] & ~usBB & filter, enemyBB, from, moves);
     }
 
     private static void genRookMoves(long rookBB, long filter, long enemyBB, long usBB, MoveList moves) 
